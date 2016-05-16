@@ -43,7 +43,7 @@ var grid = new Grid();
 
 function BlockFactory(){};
 BlockFactory.prototype = {
-	templates: ["1","111111111", "1111", "1100", "1010", "1101", "1011", "0111", "1110","111000000","100100100", "111001001", "100100111", "111100100","001001111"],
+	templates: ["1","111111111", "1111", "1100", "1010", "1101", "1011", "0111", "1110","111000000","100100100", "111001001", "100100111", "111100100","001001111", "1000010000100001000010000", "1111100000000000000000000", "1111000000000000", "1000100010001000"],
 	sprites: ["block_grass", "block_fire", "block_water", "block_wind", "block_eletric"],
 	createBlock: function(layer, x, y, onDragStart, onDragStop){
 	
@@ -51,14 +51,15 @@ BlockFactory.prototype = {
 		//				1 para block de tipo misto
 		var spriteMode = game.rnd.integerInRange(0, 1);		
 		
-		var blockTemplate = this.templates[game.rnd.integerInRange(0, this.templates.length -1)];
-		var blockTemplateSprite = this.sprites[game.rnd.integerInRange(0, this.sprites.length -1)];
+		var blockTemplate = this.templates[game.rnd.integerInRange(0, this.templates.length -1)];		
+		var blockTemplateSprite = this.getTemplate();
 		var blockTemplateSize = Math.sqrt(blockTemplate.length);		
+		
 			
 		for (var i = 0; i < blockTemplate.length; i++)
 		{							
 			if (spriteMode == 1)
-				blockTemplateSprite = this.sprites[game.rnd.integerInRange(0, this.sprites.length -1)];
+				blockTemplateSprite = this.getTemplate();
 		
 			if (typeof block == "undefined")
 			{
@@ -94,7 +95,25 @@ BlockFactory.prototype = {
 			block.events.onDragStop.add(onDragStop, this);
 		}
 		return block;		
+	},
+	getTemplate: function(){
+		var level = player.getLevel();
+		var max = 0;		
+		if (level > 5){
+			max = 1;		
+			if (level > 10){
+				max = 2;	
+				if (level > 20){
+					max = 3;	
+					if (level > 30){
+						max = 4;					
+					}				
+				}		
+			}
+		}
+		return this.sprites[game.rnd.integerInRange(0, max)];
 	}
+	
 };
 var blockFactory = new BlockFactory();
 
@@ -102,8 +121,7 @@ function Player(){};
 Player.prototype =	{
 	points: 0,
 	getLevel: function(){
-		console.log(this.points);
-		return parseInt(this.points/150); // L(n) = 150 * n;
+		return parseInt(this.points/50); // L(n) = 50 * n;
 	}
 };
 var player = new Player();
@@ -113,7 +131,7 @@ Scene.prototype = {
 	preload: function() 
 	{
 		game.load.script('font', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
-		game.load.spritesheet('block_ground', 'img/block000.png', 48, 48, 1);
+		game.load.spritesheet('block_ground', 'img/block0.png', 48, 48, 1);
 		game.load.image('block_grass', 'img/block1.png');
 		game.load.image('block_wind', 'img/block2.png');
 		game.load.image('block_fire', 'img/block3.png');
@@ -139,16 +157,6 @@ Scene.prototype = {
 		
 		// gera o layer dos textos e outras coisas 
 		this.hudLayer = game.add.group();		
-		
-		
-		
-		// primeiro repositor de pecas
-		//this.blockArea1 = new Phaser.Rectangle(0, 480, 200, 200);
-		// segundo repositor de pecas 
-		//this.blockArea2 = new Phaser.Rectangle(200, 480, 200, 200);
-		// terceiro repositor de pecas 
-		//this.blockArea3 = new Phaser.Rectangle(400, 480, 200, 200);
-			
 		
 		this.createNewBlocks();	
 		
@@ -185,7 +193,25 @@ Scene.prototype = {
 		text.boundsAlignH = "center";			
 		scene.hudLayer.add(text);
 		scene.text = text;
-		scene.updateText();
+		scene.updateText();		
+	},
+	onGameOver: function(){
+	
+		// game over
+		var graphics = game.add.graphics(0,0);
+		graphics.beginFill(0x000000, 1);
+		graphics.drawRect(0,0, game.width, game.height);      
+		graphics.alpha = 0;
+		graphics.endFill();
+		
+		game.add.tween(graphics).to({alpha: 0.8}, 600,  Phaser.Easing.Exponential.Out, true, 500);
+		
+		gameover = game.add.text(game.world.centerX, -200, 'Game Over');
+		gameover.font = 'Press Start 2P';
+		gameover.fontSize = 40;
+		gameover.fill = "#ffffff";
+		gameover.anchor.set(0.5);		
+		game.add.tween(gameover).to( { y: game.world.centerY }, 2000, Phaser.Easing.Bounce.Out, true);		
 	},
 	removeBlock: function(line)
 	{	
@@ -196,6 +222,18 @@ Scene.prototype = {
 		// atualiza a pontuação do jogador 
 		player.points++;
 		scene.updateText();
+	},
+	checkGameOver: function(){
+	
+		for (var i = 0; i < this.newBlocksLayer.countLiving(); i ++){
+			
+			var block = this.newBlocksLayer.children[i];
+			console.log(block);
+
+			
+		
+		}	
+	
 	},
 	checkLines: function()
 	{		
@@ -285,6 +323,7 @@ Scene.prototype = {
 		}
 		
 		scene.checkLines();
+		scene.checkGameOver();
 		scene.createNewBlocks(this);
 		scene.debugResult = "Drag finished";
 	},
