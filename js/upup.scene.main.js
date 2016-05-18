@@ -16,7 +16,7 @@ Grid.prototype = {
 		
 		// * 10 pois cada linha tem 10 
 		//debugResult = ((xWorld - 144)/48) +" - "+(yWorld/48) + "=" + (((xWorld - 144)/48) + ((yWorld/48)*10));
-		return (xGrid) + (yGrid* this.size);	r
+		return (xGrid) + (yGrid* this.size);
 	},
 	toColumn: function(pixelPos){
 		return (pixelPos)/ this.pixelSize;
@@ -37,6 +37,17 @@ Grid.prototype = {
 			var id = this.toArrayIndex(x,y);
 		}		
 		return this.array[id] != "undefined" && this.array[id] != null;
+	},
+	checkBlockPossible: function(x, y, blockTemp){
+		var blockSize = Math.sqrt(blockTemp.length);
+		for (var i = 0; i < blockTemp.length; i ++){
+			var auxX = (Math.floor(i / blockSize)*48) + (x*48);
+			var auxY = (i % blockSize *48) + (y*48);				
+			if ((blockTemp[i] == 1 && this.exists(auxX, auxY)) || !this.valid(auxX, auxY)){		
+				return false;
+			}
+		}
+		return true;
 	}
 };
 var grid = new Grid();
@@ -55,7 +66,6 @@ BlockFactory.prototype = {
 		var blockTemplateSprite = this.getTemplate();
 		var blockTemplateSize = Math.sqrt(blockTemplate.length);		
 		
-			
 		for (var i = 0; i < blockTemplate.length; i++)
 		{							
 			if (spriteMode == 1)
@@ -204,14 +214,20 @@ Scene.prototype = {
 		graphics.alpha = 0;
 		graphics.endFill();
 		
-		game.add.tween(graphics).to({alpha: 0.8}, 600,  Phaser.Easing.Exponential.Out, true, 500);
+		game.add.tween(graphics).to({alpha: 0.8}, 600,  Phaser.Easing.Exponential.Out, true, 1000);
 		
 		gameover = game.add.text(game.world.centerX, -200, 'Game Over');
 		gameover.font = 'Press Start 2P';
 		gameover.fontSize = 40;
 		gameover.fill = "#ffffff";
 		gameover.anchor.set(0.5);		
-		game.add.tween(gameover).to( { y: game.world.centerY }, 2000, Phaser.Easing.Bounce.Out, true);		
+		game.add.tween(gameover).to( { y: game.world.centerY }, 3000, Phaser.Easing.Bounce.Out, true, 500);		
+		
+		this.blocksLayer.setAll("inputEnabled", false);
+		this.blocksLayer.setAll("useHandCursor", false);
+		this.newBlocksLayer.setAll("inputEnabled", false);
+		this.newBlocksLayer.setAll("useHandCursor", false);
+		
 	},
 	removeBlock: function(line)
 	{	
@@ -224,16 +240,19 @@ Scene.prototype = {
 		scene.updateText();
 	},
 	checkGameOver: function(){
-	
-		for (var i = 0; i < this.newBlocksLayer.countLiving(); i ++){
-			
+		for (var i = 0; i < this.newBlocksLayer.children.length; i ++){			
 			var block = this.newBlocksLayer.children[i];
-			console.log(block);
-
-			
+			for (var j = 0; j < grid.size; j++){
+				for (var k = 0; k < grid.size; k++){
+					if (grid.checkBlockPossible(j, k, block.templateGrid)) {
+						return null;
+					}
+				}
+			}				
+		}		
+		// se chegou aqui é porque é gameover
+		this.onGameOver();	
 		
-		}	
-	
 	},
 	checkLines: function()
 	{		
@@ -323,21 +342,21 @@ Scene.prototype = {
 		}
 		
 		scene.checkLines();
-		scene.checkGameOver();
 		scene.createNewBlocks(this);
+		scene.checkGameOver();
 		scene.debugResult = "Drag finished";
 	},
 	createNewBlocks: function()
 	{	
 		var block ={};	
 		if (this.newBlocksLayer.countLiving() == 0){
-			block = blockFactory.createBlock(this.blocksLayer, 0, 480, this.onDragStart, this.onDragStop);				
+			block = blockFactory.createBlock(this.blocksLayer, 0, 500, this.onDragStart, this.onDragStop);				
 			this.newBlocksLayer.add(block);
 			
-			block = blockFactory.createBlock(this.blocksLayer, 200, 480, this.onDragStart, this.onDragStop);
+			block = blockFactory.createBlock(this.blocksLayer, 200, 500, this.onDragStart, this.onDragStop);
 			this.newBlocksLayer.add(block);
 			
-			block = blockFactory.createBlock(this.blocksLayer, 400, 480, this.onDragStart, this.onDragStop);
+			block = blockFactory.createBlock(this.blocksLayer, 400, 500, this.onDragStart, this.onDragStop);
 			this.newBlocksLayer.add(block);
 		}
 	}
