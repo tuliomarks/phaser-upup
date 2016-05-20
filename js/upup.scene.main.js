@@ -141,7 +141,7 @@ Scene.prototype = {
 	preload: function() 
 	{
 		game.load.script('font', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
-		game.load.spritesheet('block_ground', 'img/block0.png', 48, 48, 1);
+		game.load.spritesheet('block_ground', 'img/block00000.png', 48, 48, 1);
 		game.load.image('block_grass', 'img/block1.png');
 		game.load.image('block_wind', 'img/block2.png');
 		game.load.image('block_fire', 'img/block3.png');
@@ -193,14 +193,14 @@ Scene.prototype = {
 	},
 	createText: function(){
 		var text = game.add.text(0, 0, "1000");
-		text.setTextBounds(16, 16, 480, 768);
+		text.setTextBounds(0, 16, 580, 768);
 
-		text.font = 'Press Start 2P';
+		text.font = 'Mouse Memoirs';
 		text.fontSize = 20;
 		text.fill = "#ffffff";
 		text.align = 'center';
 		text.boundsAlignV = 'top';
-		text.boundsAlignH = "center";			
+		text.boundsAlignH = "right";			
 		scene.hudLayer.add(text);
 		scene.text = text;
 		scene.updateText();		
@@ -217,8 +217,8 @@ Scene.prototype = {
 		game.add.tween(graphics).to({alpha: 0.8}, 600,  Phaser.Easing.Exponential.Out, true, 1000);
 		
 		gameover = game.add.text(game.world.centerX, -200, 'Game Over');
-		gameover.font = 'Press Start 2P';
-		gameover.fontSize = 40;
+		gameover.font = 'Mouse Memoirs';
+		gameover.fontSize = 72;
 		gameover.fill = "#ffffff";
 		gameover.anchor.set(0.5);		
 		game.add.tween(gameover).to( { y: game.world.centerY }, 3000, Phaser.Easing.Bounce.Out, true, 500);		
@@ -283,7 +283,8 @@ Scene.prototype = {
 					game.add.tween(arr[j]).to({alpha: 0}, 50, Phaser.Easing.Exponential.Out, true, 30+(50*j)).onComplete.add(function(block){this.removeBlock(block);}, this);
 				}
 			}
-		}
+		}	
+		
 	},
 	onDragStart: function (sprite, pointer) 
 	{			
@@ -343,7 +344,7 @@ Scene.prototype = {
 		
 		scene.checkLines();
 		scene.createNewBlocks(this);
-		scene.checkGameOver();
+		setTimeout(function(){ scene.checkGameOver(); }, 600); // precisa desse pela animação de tirar os caras do grid 
 		scene.debugResult = "Drag finished";
 	},
 	createNewBlocks: function()
@@ -379,7 +380,8 @@ window.onload = function() {
 
 		//  The Google Fonts we want to load (specify as many as you like in the array)
 		google: {
-		  families: ['Press Start 2P']
+		  //families: ['Press Start 2P']
+		  families: ['Mouse Memoirs']
 		}
 	};	
 };
