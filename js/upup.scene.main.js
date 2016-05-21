@@ -43,11 +43,13 @@ Grid.prototype = {
 		for (var i = 0; i < blockTemp.length; i ++){
 			var auxX = (Math.floor(i / blockSize)*48) + (x*48);
 			var auxY = (i % blockSize *48) + (y*48);				
-			if ((blockTemp[i] == 1 && this.exists(auxX, auxY)) || !this.valid(auxX, auxY)){		
-				return false;
+			if (blockTemp[i] == 1 && this.exists(auxX, auxY)){		
+				return 0;
+			}else if (blockTemp[i] == 1 && !this.valid(auxX, auxY)){
+				return -1;
 			}
 		}
-		return true;
+		return 1;
 	}
 };
 var grid = new Grid();
@@ -244,8 +246,8 @@ Scene.prototype = {
 			var block = this.newBlocksLayer.children[i];
 			for (var j = 0; j < grid.size; j++){
 				for (var k = 0; k < grid.size; k++){
-					if (grid.checkBlockPossible(j, k, block.templateGrid)) {
-						return null;
+					if (grid.checkBlockPossible(j, k, block.templateGrid) == 1) {
+						return;
 					}
 				}
 			}				
