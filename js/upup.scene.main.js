@@ -143,12 +143,12 @@ Scene.prototype = {
 	preload: function() 
 	{
 		game.load.script('font', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
-		game.load.spritesheet('block_ground', 'img/block00000.png', 48, 48, 1);
-		game.load.image('block_grass', 'img/block1.png');
-		game.load.image('block_wind', 'img/block2.png');
-		game.load.image('block_fire', 'img/block3.png');
-		game.load.image('block_water', 'img/block4.png');
-		game.load.image('block_eletric', 'img/block5.png');
+		game.load.spritesheet('block_ground', 'img/Socket4.png', 48, 48, 1);
+		game.load.image('block_grass', 'img/Laguz.png');
+		game.load.image('block_wind', 'img/Othala.png');
+		game.load.image('block_fire', 'img/Elhaz.png');
+		game.load.image('block_water', 'img/Berkano.png');
+		game.load.image('block_eletric', 'img/Sowilo.png');
 	},
 	create: function() 
 	{
@@ -157,7 +157,8 @@ Scene.prototype = {
 		game.scale.pageAlignVertically = true;
 		game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 	
-		game.stage.backgroundColor = '#20082a';
+		//game.stage.backgroundColor = '#20082a';
+		game.stage.backgroundColor = '#2c2929';
 		
 		this.board = game.add.tileSprite(0, 0, 480, 480, 'block_ground');		
 		
@@ -197,7 +198,7 @@ Scene.prototype = {
 		var text = game.add.text(0, 0, "1000");
 		text.setTextBounds(0, 16, 580, 768);
 
-		text.font = 'Mouse Memoirs';
+		text.font = 'Skranji';
 		text.fontSize = 20;
 		text.fill = "#ffffff";
 		text.align = 'center';
@@ -219,7 +220,7 @@ Scene.prototype = {
 		game.add.tween(graphics).to({alpha: 0.8}, 600,  Phaser.Easing.Exponential.Out, true, 1000);
 		
 		gameover = game.add.text(game.world.centerX, -200, 'Game Over');
-		gameover.font = 'Mouse Memoirs';
+		gameover.font = 'Skranji';
 		gameover.fontSize = 72;
 		gameover.fill = "#ffffff";
 		gameover.anchor.set(0.5);		
@@ -383,7 +384,8 @@ window.onload = function() {
 		//  The Google Fonts we want to load (specify as many as you like in the array)
 		google: {
 		  //families: ['Press Start 2P']
-		  families: ['Mouse Memoirs']
+		  //families: ['Mouse Memoirs']
+		  families: ['Skranji']
 		}
 	};	
 };
